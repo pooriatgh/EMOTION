@@ -1,6 +1,7 @@
 from mesa import Agent, Model
 from mesa.time import RandomActivation
 import random
+from statistics import mode
 
 
 class TDISAgent(Agent):
@@ -17,13 +18,18 @@ class TDISAgent(Agent):
 
     def step(self):
         for n in self.NeighborList:
+            neighborAgentMethod = []
             neighborAgent = self.model.schedule.agents[n]
             if neighborAgent.Cooperation == 'D':
+                neighborAgentMethod.append('D')
                 self.Score += 0
             elif self.Cooperation == 'D':
                 self.Score += self.Payoff
+                neighborAgentMethod.append('C')
             else:
                 self.Score += 1
+                neighborAgentMethod.append('C')
+        self.Cooperation = mode(neighborAgentMethod)
 
 
 
