@@ -10,20 +10,36 @@ class Graph:
         if type == "edros":
             self.edrosrenni()
         elif type == "scalefree":
-            self.scalefree()
+            self.scalefreeDirected()
+        elif type == "barabasi":
+            self.barabasi()
 
     def edrosrenni(self):
-        self.G = nx.erdos_renyi_graph(self.NodeNumber, 0.5, None, True)
+        self.G = nx.erdos_renyi_graph(self.NodeNumber, 0.5, None, False)
         self.NodeList = self.G.nodes()
         self.EdgeList = self.G.edges()
 
-    def scalefree(self):
-        self.G = nx.scale_free_graph(self.NodeNumber)
+    def scalefreeDirected(self):
+        self.G = nx.generators.random_k_out_graph(n=self.NodeNumber, k=2, alpha=2.1, self_loops=False)
         self.NodeList = self.G.nodes()
         self.EdgeList = self.G.edges()
+
+    def barabasi(self):
+        self.G = nx.barabasi_albert_graph(self.NodeNumber,m=2)
+        self.NodeList = self.G.nodes()
+        self.EdgeList = self.G.edges()
+
+    def follower(self, node):
+        inEdges = self.G.in_edges(node)
+        if len(inEdges) != 0:
+            return [*list(zip(*inEdges))[1]]
+        return []
 
     def following(self, node):
         outEdges = self.G.out_edges(node)
         if len(outEdges) != 0:
-            return list(zip(*outEdges))[1]
+            return [*list(zip(*outEdges))[1]]
         return []
+
+    def neighbor(self, node):
+        return list(nx.neighbors(self.G, node))

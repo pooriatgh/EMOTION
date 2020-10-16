@@ -41,8 +41,8 @@ class TDISAgent(Agent):
         self.HistoryOfSteps = []
 
     def step(self):
+        neighborAgentMethod = []
         for n in self.NeighborList:
-            neighborAgentMethod = []
             neighborAgent = self.model.schedule.agents[n]
             if neighborAgent.Cooperation == 'D':
                 neighborAgentMethod.append('D')
@@ -59,6 +59,37 @@ class TDISAgent(Agent):
             self.Trustful = 1
         else:
             self.Trustful = -1
+
+    def selectNextActive(self):
+        neighborAgentTrustfulActive = 0
+        neighborAgentUntrustfulActive = 0
+        neighborAgentTrustfulInActive = 0
+        neighborAgentUntrustfulInActive = 0
+        alpha = 0
+        teta = 1
+        if len(self.NeighborList) == 0:
+            self.Active = 0
+        else:
+            for n in self.NeighborList:
+                neighborAgent = self.model.schedule.agents[n]
+                if neighborAgent.Active == 1:
+                    if neighborAgent.Trustful == 1:
+                        neighborAgentTrustfulActive += 1
+                    else:
+                        neighborAgentUntrustfulActive += 1
+                else:
+                    if neighborAgent.Trustful == 1:
+                        neighborAgentTrustfulInActive += 1
+                    else:
+                        neighborAgentUntrustfulInActive += 1
+
+        I = ((1 + alpha) * neighborAgentTrustfulActive + (1 - alpha) * neighborAgentUntrustfulActive) / \
+            (((1 + alpha) * (neighborAgentTrustfulActive + neighborAgentTrustfulInActive))
+             + ((1 - alpha) * (neighborAgentUntrustfulActive + neighborAgentUntrustfulInActive)))
+        if I > teta:
+            self.Active = 1
+        else:
+            self.Active = 0
 
     def selectNextCooperation(self):
         nextMove = []
@@ -77,7 +108,7 @@ class TDISModel(Model):
 
     def __init__(self, graph):
         self.Graph = graph
-        self.schedule = StagedActivation(self, ["step", "selectNextCooperation"])  # RandomActivation(self)
+        self.schedule = StagedActivation(self, ["step", "selectNextCooperation", "selectNextActive"])
         # Create agents
         for i in self.Graph.NodeList:
             cooperationInit = random.choice(['C', 'D'])
@@ -86,7 +117,7 @@ class TDISModel(Model):
             else:
                 trustfulInit = 0
             activeInit = random.choice([0, 1])
-            neighborListInit = self.Graph.following(i)
+            neighborListInit = self.Graph.neighbor(i)
             a = TDISAgent(i, trustfulInit, activeInit, cooperationInit, 2, neighborListInit, self)
             self.schedule.add(a)
 

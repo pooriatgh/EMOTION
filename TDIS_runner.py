@@ -9,7 +9,7 @@ if __name__ == '__main__':
     all_score = []
     degree_list = []
     # This runs the model 100 times, each model executing 10 steps.
-    G = Graph(100,"scalefree")
+    G = Graph(100,"barabasi")
     for j in range(1):
         # Run the model
         model = TDISModel(G)
