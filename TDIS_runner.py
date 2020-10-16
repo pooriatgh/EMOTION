@@ -19,7 +19,7 @@ if __name__ == '__main__':
         for agent in model.schedule.agents:
             all_trust.append(agent.Trustful)
             all_active.append(agent.Active)
-            all_score.append(agent.Score)
+            all_score.append(agent.Cooperation)
             degree_list.append(len(agent.NeighborList))
     # plt.hist(all_trust)
     # plt.show()
