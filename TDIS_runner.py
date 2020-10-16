@@ -12,7 +12,7 @@ if __name__ == '__main__':
     for j in range(1):
         # Run the model
         model = TDISModel(G)
-        for i in range(1):
+        for i in range(5):
             model.step()
 
         # Store the results

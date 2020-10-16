@@ -20,6 +20,7 @@ class TDISAgent(Agent):
         self.NeighborList = initNeighborList
         self.Score = 0
         self.Payoff = payoff
+        self.HistoryOfSteps = []
 
     def step(self):
         for n in self.NeighborList:
@@ -34,7 +35,7 @@ class TDISAgent(Agent):
             else:
                 self.Score += 1
                 neighborAgentMethod.append('C')
-        self.selectNextCooperation()
+        self.HistoryOfSteps.append(self.Cooperation)
 
     def selectNextCooperation(self):
         nextMove = []
