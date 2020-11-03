@@ -13,20 +13,17 @@ if __name__ == '__main__':
     for j in range(1):
         # Run the model
         model = TDISModel(G)
-        for i in range(5):
+        for i in range(20):
             model.step()
 
+        gini = model.datacollector.get_model_vars_dataframe()
+        gini['trust'].plot()
+        plt.show()
+        gini['active'].plot()
+        plt.show()
+
         # Store the results
-        for agent in model.schedule.agents:
-            all_trust.append(agent.Trustful)
-            all_coop.append(agent.Cooperation)
-            all_active.append(agent.Active)
-            degree_list.append(len(agent.NeighborList))
-    plt.hist(all_trust)
-    plt.show()
-    plt.hist(all_coop)
-    plt.show()
-    plt.hist(all_active)
-    plt.show()
-    plt.hist(degree_list)
-    plt.show()
+        # for agent in model.schedule.agents:
+        #     degree_list.append(len(agent.NeighborList))
+    # plt.hist(degree_list)
+    # plt.show()

@@ -1,12 +1,26 @@
-from mesa import Agent, Model
-from mesa.time import RandomActivation
-from mesa.time import StagedActivation
 import random
-from collections import Counter
+from mesa import Agent, Model
+from mesa.datacollection import DataCollector
+from mesa.time import StagedActivation
 
 
 def assignWithProb(choice1, choice2, prob):
     return choice1 if random.random() < prob else choice2
+
+
+def compute_trust_porportion(model):
+    agent_trustful = [agent.Trustful for agent in model.schedule.agents]
+    agent_trusted_count = agent_trustful.count(1)
+    agent_untrusted_count = agent_trustful.count(0)
+    B = (agent_trusted_count) / (agent_untrusted_count + 1)
+    return B
+
+def compute_Active_porportion(model):
+    agent_active = [agent.Active for agent in model.schedule.agents]
+    agent_active_count = agent_active.count(1)
+    agent_inactive_count = agent_active.count(0)
+    B = (agent_active_count+1) / (agent_inactive_count + 1)
+    return B
 
 
 # Function to return majority element present in given list
@@ -58,7 +72,7 @@ class TDISAgent(Agent):
         if mElement != -1 and mElement == 'C':
             self.Trustful = 1
         else:
-            self.Trustful = -1
+            self.Trustful = 0
 
     def selectNextActive(self):
         neighborAgentTrustfulActive = 0
@@ -66,7 +80,7 @@ class TDISAgent(Agent):
         neighborAgentTrustfulInActive = 0
         neighborAgentUntrustfulInActive = 0
         alpha = 0
-        teta = 1
+        teta = 0.3
         if len(self.NeighborList) == 0:
             self.Active = 0
         else:
@@ -121,5 +135,10 @@ class TDISModel(Model):
             a = TDISAgent(i, trustfulInit, activeInit, cooperationInit, 2, neighborListInit, self)
             self.schedule.add(a)
 
+        self.datacollector = DataCollector(
+            model_reporters={"trust": compute_trust_porportion,"active":compute_Active_porportion},
+            agent_reporters={"Score": "Score"})
+
     def step(self):
+        self.datacollector.collect(self)
         self.schedule.step()
