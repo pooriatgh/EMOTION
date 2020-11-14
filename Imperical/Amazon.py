@@ -17,7 +17,8 @@ def buildCSVForAmazonMovie():
             if ":" in line:
                 tag, value = line.split(":", 1)
                 tag = tag.replace("/", "")
-                value = value.rstrip()
+                value = value.rstrip().replace("<br />"," ").replace('"', "").replace('\'', "")\
+                    .replace(',', " ").replace('{', "").replace('}', "").replace('/', " ").replace('\\', " ").replace('#', " ").replace('\n', "")
                 review[tag] = value
         except Exception as e:
             print(e)
