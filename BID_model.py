@@ -2,7 +2,6 @@ import random
 from mesa import Agent, Model
 from mesa.datacollection import DataCollector
 from mesa.time import StagedActivation
-import math
 
 
 def assignWithProb(choice1, choice2, prob):
@@ -11,17 +10,26 @@ def assignWithProb(choice1, choice2, prob):
 
 def compute_Belief_porportion(model):
     agent_Belief = [agent.Belief for agent in model.schedule.agents]
-    agent_Belief_count = agent_Belief.count(1)
-    agent_Disbelief_count = agent_Belief.count(-1)
-    B = agent_Belief_count / (agent_Disbelief_count + 1)
-    return B
+    B = sum(map(lambda x: x >= model.UncertaintyBoundary, agent_Belief))
+    return B/len(agent_Belief)
+
+
+def compute_Uncertain_porportion(model):
+    agent_Belief = [agent.Belief for agent in model.schedule.agents]
+    B = sum(map(lambda x: model.UncertaintyBoundary > x > -model.UncertaintyBoundary, agent_Belief))
+    return B/len(agent_Belief)
+
+def compute_Disbelief_porportion(model):
+    agent_Belief = [agent.Belief for agent in model.schedule.agents]
+    B = sum(map(lambda x: x <= -model.UncertaintyBoundary, agent_Belief))
+    return B/len(agent_Belief)
 
 
 def compute_Active_porportion(model):
     agent_active = [agent.Active for agent in model.schedule.agents]
     agent_active_count = agent_active.count(1)
     agent_inactive_count = agent_active.count(0)
-    B = (agent_active_count + 1) / (agent_inactive_count + 1)
+    B = agent_active_count / (agent_active_count + agent_inactive_count)
     return B
 
 
@@ -46,10 +54,13 @@ def majorityElement(A):
 class BIDAgent(Agent):
     """ An agent with fixed initial wealth."""
 
-    def __init__(self, unique_id, initBelief, initActive, payoff, initNeighborList, alpha, model):
+    def __init__(self, unique_id, initBelief, initActive, payoff, initNeighborList, alpha, teta, uncertainBoundary,
+                 model):
         super().__init__(unique_id, model)
         self.Belief = initBelief
         self.Alpha = alpha
+        self.Teta = teta
+        self.UncertainBoundary = uncertainBoundary
         self.Active = initActive
         self.NeighborList = initNeighborList
         self.Payoff = payoff
@@ -57,16 +68,21 @@ class BIDAgent(Agent):
 
     def step(self):
         self.Payoff = 0
-        for n in self.NeighborList:
-            neighborAgent = self.model.schedule.agents[n]
-            if neighborAgent.Belief >= 0 and self.Belief >= 0:
-                self.Payoff += 1
-            elif self.Belief < 0:
-                self.Payoff += 1 - self.Alpha
+        if self.UncertainBoundary > self.Belief > -self.UncertainBoundary:
+            for n in self.NeighborList:
+                neighborAgent = self.model.schedule.agents[n]
+                if neighborAgent.Belief >= 0 and self.Belief >= 0:
+                    self.Payoff += 1
+                elif neighborAgent.Belief < 0 and self.Belief < 0:
+                    self.Payoff += 1
+                elif self.Belief < 0:
+                    self.Payoff += 1 - self.Alpha
+                else:
+                    self.Payoff += self.Alpha - 1
+            if len(self.NeighborList) > 0:
+                self.Belief = (self.Belief + self.Payoff / len(self.NeighborList)) / 2
             else:
-                self.Payoff += self.Alpha - 1
-        if len(self.NeighborList) > 0:
-            self.Belief = (self.Belief + self.Payoff / len(self.NeighborList)) / 2
+                self.Belief = self.Belief
         else:
             self.Belief = self.Belief
         self.HistoryOfSteps.append(self.Belief)
@@ -74,7 +90,6 @@ class BIDAgent(Agent):
     def selectNextActive(self):
         neighborActive = 0
         neighborInActive = 0
-        teta = 0.5
         if len(self.NeighborList) == 0:
             self.Active = 0
         else:
@@ -84,32 +99,49 @@ class BIDAgent(Agent):
                     neighborActive += 1
                 else:
                     neighborInActive += 1
-            I = abs(self.Belief)/2 * neighborActive/len(self.NeighborList)
-            if I > teta:
-                self.Active = 1
-            else:
-                self.Active = 0
 
+            if self.Active == 0:  # if it has not activated yet
+                if self.Belief > self.UncertainBoundary:  # if you belief something you dont care about your neighbors
+                    self.Active = 1
+                elif self.Belief < -self.UncertainBoundary:
+                    self.Active = 0
+                else:  # if you are not sure about sth you see your friends
+                    I = neighborActive / len(self.NeighborList)
+                    if I > self.Teta:
+                        self.Active = 1
 
 
 class BIDModel(Model):
     """A model with some number of agents."""
 
-    def __init__(self, graph):
+    def __init__(self, alpha, teta, uncertaintyBoundary, graph,ActiveInit):
         self.Graph = graph
-        self.schedule = StagedActivation(self, ["step" , "selectNextActive"])
-        alpha = 0.5
+        self.schedule = StagedActivation(self, ["step", "selectNextActive"])
+        self.Alpha = alpha
+        self.Teta = teta
+        self.UncertaintyBoundary = uncertaintyBoundary
+        self.Active = ActiveInit
         # Create agents
         for i in self.Graph.NodeList:
-            beliefInit = random.randint(-1, 1)
-            activeInit = random.choice([0, 1])
+
+            activeInit = random.choices([0, 1],weights=(1-self.Active,self.Active))
+            if activeInit == 1:
+                beliefInit = random.randint(0, 1)
+            else:
+                beliefInit = random.randint(-1, 0)
+
             neighborListInit = self.Graph.neighbor(i)
-            a = BIDAgent(i, beliefInit, activeInit, 0, neighborListInit, alpha, self)
+            a = BIDAgent(i, beliefInit, activeInit, 0, neighborListInit, self.Alpha,
+                         self.Teta, self.UncertaintyBoundary,
+                         self)
             self.schedule.add(a)
 
         self.datacollector = DataCollector(
-            model_reporters={"B_to_D": compute_Belief_porportion, "active": compute_Active_porportion}
-            ,agent_reporters={"Belief": "Belief"})
+            model_reporters={"BeliefCount": compute_Belief_porportion,
+                             "DisbeliefCount": compute_Disbelief_porportion,
+                             "UncertainCount": compute_Uncertain_porportion,
+                             "active": compute_Active_porportion}
+            , agent_reporters={"Belief": "Belief"})
 
     def step(self):
         self.datacollector.collect(self)
