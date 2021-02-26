@@ -5,10 +5,12 @@ sns.set_theme()
 import matplotlib.pyplot as plt
 
 
-def heatMap(twoDArray):
+def heatMap(twoDArray,path):
+    fig = plt.figure()
     ax = sns.heatmap(twoDArray)
     ax.axes.get_yaxis().set_visible(False)
     plt.show()
+    fig.savefig(path)
 
 
 def createNumpy2DArray():

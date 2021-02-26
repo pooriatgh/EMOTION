@@ -2,6 +2,7 @@ import random
 from mesa import Agent, Model
 from mesa.datacollection import DataCollector
 from mesa.time import StagedActivation
+import numpy as np
 
 
 def assignWithProb(choice1, choice2, prob):
@@ -10,19 +11,20 @@ def assignWithProb(choice1, choice2, prob):
 
 def compute_Belief_porportion(model):
     agent_Belief = [agent.Belief for agent in model.schedule.agents]
-    B = sum(map(lambda x: x >= model.UncertaintyBoundary, agent_Belief))
-    return B/len(agent_Belief)
+    B = sum(map(lambda x: x >= model.uncertaintyU, agent_Belief))
+    return B / len(agent_Belief)
 
 
 def compute_Uncertain_porportion(model):
     agent_Belief = [agent.Belief for agent in model.schedule.agents]
-    B = sum(map(lambda x: model.UncertaintyBoundary > x > -model.UncertaintyBoundary, agent_Belief))
-    return B/len(agent_Belief)
+    B = sum(map(lambda x: model.uncertaintyU > x > -model.uncertaintyL, agent_Belief))
+    return B / len(agent_Belief)
+
 
 def compute_Disbelief_porportion(model):
     agent_Belief = [agent.Belief for agent in model.schedule.agents]
-    B = sum(map(lambda x: x <= -model.UncertaintyBoundary, agent_Belief))
-    return B/len(agent_Belief)
+    B = sum(map(lambda x: x <= model.uncertaintyL, agent_Belief))
+    return B / len(agent_Belief)
 
 
 def compute_Active_porportion(model):
@@ -54,13 +56,15 @@ def majorityElement(A):
 class BIDAgent(Agent):
     """ An agent with fixed initial wealth."""
 
-    def __init__(self, unique_id, initBelief, initActive, payoff, initNeighborList, alpha, teta, uncertainBoundary,
+    def __init__(self, unique_id, initBelief, initActive, payoff, initNeighborList, alpha, teta,
+                 uncertaintyL, uncertaintyU,
                  model):
         super().__init__(unique_id, model)
         self.Belief = initBelief
         self.Alpha = alpha
         self.Teta = teta
-        self.UncertainBoundary = uncertainBoundary
+        self.uncertaintyL = uncertaintyL
+        self.uncertaintyU = uncertaintyU
         self.Active = initActive
         self.NeighborList = initNeighborList
         self.Payoff = payoff
@@ -68,7 +72,7 @@ class BIDAgent(Agent):
 
     def step(self):
         self.Payoff = 0
-        if self.UncertainBoundary > self.Belief > -self.UncertainBoundary:
+        if self.uncertaintyU > self.Belief > self.uncertaintyL:
             for n in self.NeighborList:
                 neighborAgent = self.model.schedule.agents[n]
                 if neighborAgent.Belief >= 0 and self.Belief >= 0:
@@ -101,9 +105,9 @@ class BIDAgent(Agent):
                     neighborInActive += 1
 
             if self.Active == 0:  # if it has not activated yet
-                if self.Belief > self.UncertainBoundary:  # if you belief something you dont care about your neighbors
+                if self.Belief > self.uncertaintyU:  # if you belief something you dont care about your neighbors
                     self.Active = 1
-                elif self.Belief < -self.UncertainBoundary:
+                elif self.Belief < self.uncertaintyL:
                     self.Active = 0
                 else:  # if you are not sure about sth you see your friends
                     I = neighborActive / len(self.NeighborList)
@@ -114,25 +118,26 @@ class BIDAgent(Agent):
 class BIDModel(Model):
     """A model with some number of agents."""
 
-    def __init__(self, alpha, teta, uncertaintyBoundary, graph,ActiveInit):
+    def __init__(self, alpha, teta, uncertaintyL, uncertaintyU, graph, ActiveInit):
         self.Graph = graph
         self.schedule = StagedActivation(self, ["step", "selectNextActive"])
         self.Alpha = alpha
         self.Teta = teta
-        self.UncertaintyBoundary = uncertaintyBoundary
+        self.uncertaintyL = uncertaintyL
+        self.uncertaintyU = uncertaintyU
         self.Active = ActiveInit
+        activeInit = np.random.choice([0, 1], len(self.Graph.NodeList), p=[1 - self.Active, self.Active])
         # Create agents
         for i in self.Graph.NodeList:
 
-            activeInit = random.choices([0, 1],weights=(1-self.Active,self.Active))
-            if activeInit == 1:
+            if activeInit[i] == 1:
                 beliefInit = random.randint(0, 1)
             else:
                 beliefInit = random.randint(-1, 0)
 
             neighborListInit = self.Graph.neighbor(i)
-            a = BIDAgent(i, beliefInit, activeInit, 0, neighborListInit, self.Alpha,
-                         self.Teta, self.UncertaintyBoundary,
+            a = BIDAgent(i, beliefInit, activeInit[i], 0, neighborListInit, self.Alpha,
+                         self.Teta, self.uncertaintyL, self.uncertaintyU,
                          self)
             self.schedule.add(a)
 
