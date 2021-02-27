@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6a775da8-3310-40af-98a5-d491da4ee546" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/TDIS.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/TDIS.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BID_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/BID_model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BID_runner.py" beforeDir="false" afterPath="$PROJECT_DIR$/BID_runner.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Plotter.py" beforeDir="false" afterPath="$PROJECT_DIR$/Plotter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/graph_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/graph_model.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -20,7 +18,7 @@
     <SUITE FILE_PATH="coverage/TDIS$TDIS_model.coverage" NAME="TDIS_model Coverage Results" MODIFIED="1602923280992" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/TDIS$money_model.coverage" NAME="money_model Coverage Results" MODIFIED="1602750284352" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/TDIS$TDIS_runner.coverage" NAME="TDIS_runner Coverage Results" MODIFIED="1612197674113" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/TDIS$BID_runner.coverage" NAME="BID_runner Coverage Results" MODIFIED="1614336642913" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/TDIS$BID_runner.coverage" NAME="BID_runner Coverage Results" MODIFIED="1614342175754" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/TDIS$Plotter.coverage" NAME="Plotter Coverage Results" MODIFIED="1612201016542" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/TDIS$graph_model.coverage" NAME="graph_model Coverage Results" MODIFIED="1602778523947" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
@@ -76,54 +74,59 @@
     <session id="-902210831">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="13" />
+          <entry key="project.closed" value="15" />
           <entry key="project.open.time.1" value="3" />
           <entry key="project.open.time.12" value="1" />
-          <entry key="project.open.time.13" value="1" />
+          <entry key="project.open.time.13" value="2" />
           <entry key="project.open.time.14" value="2" />
-          <entry key="project.open.time.15" value="2" />
+          <entry key="project.open.time.15" value="3" />
           <entry key="project.open.time.16" value="1" />
           <entry key="project.open.time.17" value="1" />
           <entry key="project.open.time.2" value="1" />
           <entry key="project.open.time.21" value="1" />
           <entry key="project.open.time.9" value="1" />
-          <entry key="project.opened" value="14" />
+          <entry key="project.opened" value="16" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="0" value="1" />
           <entry key="csv" value="3" />
-          <entry key="py" value="29" />
+          <entry key="py" value="34" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="PLAIN_TEXT" value="4" />
-          <entry key="Python" value="29" />
+          <entry key="Python" value="34" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="3210" />
-          <entry key="txt" value="118" />
+          <entry key="py" value="3728" />
+          <entry key="txt" value="167" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="118" />
-          <entry key="Python" value="3210" />
+          <entry key="PLAIN_TEXT" value="167" />
+          <entry key="Python" value="3728" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.vcs.git.usages">
+        <counts>
+          <entry key="git.branch.create.new" value="1" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/BID_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-425">
-              <caret line="26" column="32" lean-forward="true" selection-start-line="26" selection-start-column="32" selection-end-line="26" selection-end-column="32" />
+            <state relative-caret-position="188">
+              <caret line="63" column="12" selection-start-line="63" selection-start-column="8" selection-end-line="63" selection-end-column="12" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -131,13 +134,26 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/BID_runner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="157">
-              <caret line="55" column="82" selection-start-line="55" selection-start-column="82" selection-end-line="55" selection-end-column="82" />
+            <state relative-caret-position="119">
+              <caret line="23" column="21" selection-start-line="23" selection-start-column="16" selection-end-line="23" selection-end-column="21" />
               <folding>
                 <element signature="e#0#30#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/graph_model.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="901">
+              <caret line="57" selection-start-line="57" selection-end-line="57" />
+              <folding>
+                <element signature="e#0#21#0" expanded="true" />
+                <marker date="1614342175444" expanded="true" signature="1464:1465" ph="..." />
               </folding>
             </state>
           </provider>
@@ -165,6 +181,11 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -176,11 +197,11 @@
         <option value="$PROJECT_DIR$/TDIS_runner.py" />
         <option value="$PROJECT_DIR$/TDIS_model.py" />
         <option value="$PROJECT_DIR$/Imperical/BID_runner.py" />
-        <option value="$PROJECT_DIR$/graph_model.py" />
         <option value="$PROJECT_DIR$/Content_model.py" />
         <option value="$PROJECT_DIR$/Plotter.py" />
         <option value="$PROJECT_DIR$/BID_model.py" />
         <option value="$PROJECT_DIR$/BID_runner.py" />
+        <option value="$PROJECT_DIR$/graph_model.py" />
       </list>
     </option>
   </component>
@@ -202,6 +223,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -213,7 +235,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -478,35 +499,41 @@
       <option name="project" value="LOCAL" />
       <updated>1613080627801</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="- Uncertainty converted to a boundry low and high">
+      <created>1614336975433</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1614336975433</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.19969743" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2193646" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.42459017" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.18688525" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.14754099" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.009836066" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="8" weight="0.14461538" />
+      <window_info active="true" anchor="bottom" id="Version Control" order="8" visible="true" weight="0.29508197" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.34461537" />
       <window_info anchor="bottom" id="Python Console" order="12" weight="0.096721314" />
-      <window_info anchor="right" x="0" y="0" width="295" height="544" id="Documentation" sideWeight="0.20512821" side_tool="true" visible="true" weight="0.11119516" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info active="true" anchor="right" id="SciView" order="3" sideWeight="0.7948718" visible="true" weight="0.11119516" />
+      <window_info anchor="right" id="SciView" order="3" sideWeight="0.7930232" visible="true" weight="0.15885022" />
       <window_info anchor="right" id="Database" order="4" weight="0.32980332" />
+      <window_info anchor="right" x="0" y="0" width="295" height="544" id="Documentation" order="5" sideWeight="0.20697674" side_tool="true" visible="true" weight="0.15885022" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -526,7 +553,8 @@
     <MESSAGE value=" - minor bug" />
     <MESSAGE value="- BID model is added" />
     <MESSAGE value="- content model is added&#10;- new way to set multiple config file&#10;- save dataframes" />
-    <option name="LAST_COMMIT_MESSAGE" value="- content model is added&#10;- new way to set multiple config file&#10;- save dataframes" />
+    <MESSAGE value="- Uncertainty converted to a boundry low and high" />
+    <option name="LAST_COMMIT_MESSAGE" value="- Uncertainty converted to a boundry low and high" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -535,6 +563,11 @@
           <url>file://$PROJECT_DIR$/TDIS_runner.py</url>
           <line>18</line>
           <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/graph_model.py</url>
+          <line>70</line>
+          <option name="timeStamp" value="17" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -549,47 +582,47 @@
     </expressions>
     <expressions id="evaluateExpression">
       <expression>
-        <expression-string>resultDataframe.plot()</expression-string>
+        <expression-string>G_B.G</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>resultDataframe</expression-string>
+        <expression-string>edges</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>modelData</expression-string>
+        <expression-string>rand</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>modelData.tail(1)[&quot;active&quot;].values[0]</expression-string>
+        <expression-string>G_B</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>modelData[-1:0][&quot;active&quot;].values[0]</expression-string>
+        <expression-string>np.random.choice([0, 1], len(self.AgentList) * len(self.ContentList), p=[p, 1 - p])</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>modelData.tail(1)[&quot;active&quot;]/10</expression-string>
+        <expression-string>np.random.choice([0, 1], self.AgentList * self.ContentList, p=[p, 1 - p])</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>modelData.tail(1)[&quot;active&quot;]</expression-string>
+        <expression-string>self.AgentList</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>modelData.tail()[&quot;active&quot;]</expression-string>
+        <expression-string>temp.edges</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>modelData[-1:0][&quot;active&quot;]</expression-string>
+        <expression-string>self.ContentList[0].Name</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -652,9 +685,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Result/model_barabasi_20_100_1_1_3.0_9.0.csv">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/Result/model_barabasi_20_100_1_1_3.0_9.0.csv" />
     <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/site-packages/pandas/core/generic.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="88">
@@ -683,13 +714,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/graph_model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="19" column="38" lean-forward="true" selection-start-line="19" selection-start-column="38" selection-end-line="19" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Content_model.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="51">
@@ -697,25 +721,48 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/BID_model.py">
+    <entry file="file://$PROJECT_DIR$/Result/Active_barabasi_20_100.csv" />
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/site-packages/networkx/classes/reportviews.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-425">
-          <caret line="26" column="32" lean-forward="true" selection-start-line="26" selection-start-column="32" selection-end-line="26" selection-end-column="32" />
+        <state relative-caret-position="2890">
+          <caret line="171" selection-start-line="171" selection-end-line="171" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/codecs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="110">
+          <caret line="309" selection-start-line="309" selection-end-line="309" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/graph_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="901">
+          <caret line="57" selection-start-line="57" selection-end-line="57" />
           <folding>
-            <element signature="e#0#13#0" expanded="true" />
+            <element signature="e#0#21#0" expanded="true" />
+            <marker date="1614342175444" expanded="true" signature="1464:1465" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Result/Active_barabasi_20_100.csv">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/BID_runner.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="55" column="82" selection-start-line="55" selection-start-column="82" selection-end-line="55" selection-end-column="82" />
+        <state relative-caret-position="119">
+          <caret line="23" column="21" selection-start-line="23" selection-start-column="16" selection-end-line="23" selection-end-column="21" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/BID_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="188">
+          <caret line="63" column="12" selection-start-line="63" selection-start-column="8" selection-end-line="63" selection-end-column="12" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>

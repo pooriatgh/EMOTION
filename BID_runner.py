@@ -1,5 +1,5 @@
 from BID_model import BIDModel
-from graph_model import Graph
+from graph_model import Graph, GraphBipartite
 from Content_model import Content
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -12,14 +12,19 @@ def Experiment1():
     stepNumber = 20
     agentNumber = 1000
     # generate network
-    G = Graph(agentNumber, "barabasi")
+    G_D = Graph(agentNumber, "barabasi")
+    listContent = []
+    for i in range(10):
+        listContent.append(Content(name=i))
+
+    G_B = GraphBipartite(G_D.NodeList, listContent, 0.3)
 
     # generate contents
-    listContent = [Content(name="#covid")]
-    config1 = {"alpha": 1, "teta": 0.3, "uncertaintyL": -0.3, "uncertaintyU": .3, "graph": G, "ActiveInit": 0.3}
-    config2 = {"alpha": 1, "teta": 0.3, "uncertaintyL": -0.9, "uncertaintyU": .9, "graph": G, "ActiveInit": 0.3}
-    config3 = {"alpha": 0, "teta": 0.3, "uncertaintyL": -0.3, "uncertaintyU": .3, "graph": G, "ActiveInit": 0.3}
-    config4 = {"alpha": 0, "teta": 0.3, "uncertaintyL": -0.9, "uncertaintyU": .9, "graph": G, "ActiveInit": 0.3}
+
+    config1 = {"alpha": 1, "teta": 0.3, "uncertaintyL": -0.3, "uncertaintyU": .3, "graph": G_D, "ActiveInit": 0.3}
+    config2 = {"alpha": 1, "teta": 0.3, "uncertaintyL": -0.9, "uncertaintyU": .9, "graph": G_D, "ActiveInit": 0.3}
+    config3 = {"alpha": 0, "teta": 0.3, "uncertaintyL": -0.3, "uncertaintyU": .3, "graph": G_D, "ActiveInit": 0.3}
+    config4 = {"alpha": 0, "teta": 0.3, "uncertaintyL": -0.9, "uncertaintyU": .9, "graph": G_D, "ActiveInit": 0.3}
 
     confiList = [config1, config2, config3, config4]
     for j in range(len(confiList)):
@@ -59,8 +64,8 @@ def Experiment1():
 
         path = "Result\\fig_barabasi_" + str(stepNumber) + "_" + str(agentNumber) + "_" \
                + str(confiList[j]["alpha"]) + "_" + str(confiList[j]["alpha"]) + "_" \
-               + str(int(confiList[j]["teta"] * 10)) + "_" + str(int(confiList[j]["uncertaintyL"] * 10)) +\
-               "_" + str(int(confiList[j]["uncertaintyU"] * 10))\
+               + str(int(confiList[j]["teta"] * 10)) + "_" + str(int(confiList[j]["uncertaintyL"] * 10)) + \
+               "_" + str(int(confiList[j]["uncertaintyU"] * 10)) \
                + ".jpg"
         a = sorted(myArray, key=lambda a_entry: a_entry[1])
         heatMap(a, path)

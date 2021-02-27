@@ -1,4 +1,8 @@
 import networkx as nx
+import numpy as np
+import math
+from networkx.algorithms import bipartite
+import random
 
 
 class Graph:
@@ -25,7 +29,7 @@ class Graph:
         self.EdgeList = self.G.edges()
 
     def barabasi(self):
-        self.G = nx.barabasi_albert_graph(self.NodeNumber,m=2)
+        self.G = nx.barabasi_albert_graph(self.NodeNumber, m=2)
         self.NodeList = self.G.nodes()
         self.EdgeList = self.G.edges()
 
@@ -43,3 +47,25 @@ class Graph:
 
     def neighbor(self, node):
         return list(nx.neighbors(self.G, node))
+
+
+class GraphBipartite:
+    def __init__(self, agentList, contentList, p):
+        self.AgentList = agentList
+        self.ContentList = contentList
+        self.EdgeList = []
+        self.G = None
+        self.RandomBipartite(p)
+
+    def RandomBipartite(self, p):
+        self.G = nx.Graph()
+        edges = []
+        self.G.add_nodes_from(self.AgentList, bipartite=0)
+        self.G.add_nodes_from(self.ContentList, bipartite=1)
+        rand = np.random.choice([0, 1], len(self.AgentList) * len(self.ContentList), p=[p, 1 - p])
+        for i, a in enumerate(self.AgentList):
+            for j, c in enumerate(self.ContentList):
+                if rand[i + j] == 1:
+                    edges.append((a, c))
+
+        self.G.add_edges_from(edges)
