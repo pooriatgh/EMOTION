@@ -69,7 +69,7 @@ class BIDAgent(Agent):
         self.NeighborList = initNeighborList
         self.Payoff = payoff
         self.HistoryOfSteps = []
-
+    #test test
     def step(self):
         self.Payoff = 0
         if self.uncertaintyU > self.Belief > self.uncertaintyL:
