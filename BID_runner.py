@@ -52,8 +52,8 @@ def Experiment1():
 
         myArray = np.zeros((agentNumber, stepNumber))
         for i in range(stepNumber):
-            stepBelief = agentData.xs(i, level="Step")[
-                "Belief"]  # Store the results: https://mesa.readthedocs.io/en/stable/tutorials/intro_tutorial.html#collecting-data
+            stepBelief = agentData.xs(i, level="Step")["Belief"]
+            # Store the results: https://mesa.readthedocs.io/en/stable/tutorials/intro_tutorial.html#collecting-data
             for k in range(agentNumber):
                 myArray[k][i] = stepBelief[k]
 
@@ -65,40 +65,6 @@ def Experiment1():
         a = sorted(myArray, key=lambda a_entry: a_entry[1])
         heatMap(a, path)
 
-
-def Experiment2():
-    stepNumber = 20
-    agentNumber = 100
-    # generate network
-    G = Graph(agentNumber, "barabasi")
-    # generate contents
-    listContent = [Content(name="#covid")]
-
-    confiList = []
-    resultRow = []
-    for i in range(1, 10, 1):
-        confiList.append({"alpha": 1, "teta": 0.3, "uncertaintyL": -0.7, "uncertaintyU": .7,
-                          "graph": G, "ActiveInit": i / 10.0})
-
-    for j in range(len(confiList)):
-        # Run the model
-        model = BIDModel(alpha=confiList[j]["alpha"], teta=confiList[j]["teta"],
-                         uncertaintyL=confiList[j]["uncertaintyL"],
-                         uncertaintyU=confiList[j]["uncertaintyU"], graph=confiList[j]["graph"],
-                         ActiveInit=confiList[j]["ActiveInit"])
-        for i in tqdm(range(stepNumber), desc="steps"):
-            model.step()
-
-        modelData = model.datacollector.get_model_vars_dataframe()
-
-        reultDic = {"ActiveInit": confiList[j]["ActiveInit"], "LastActive": modelData.tail(1)["active"].values[0]}
-        resultRow.append(reultDic)
-
-        # modelData['active'].plot()
-        # plt.show()
-
-    resultDataframe = pd.DataFrame(resultRow)
-    resultDataframe.to_csv("Result\Active_barabasi_" + str(stepNumber) + "_" + str(agentNumber) + ".csv")
 
 
 if __name__ == '__main__':

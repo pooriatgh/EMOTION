@@ -10,7 +10,7 @@ def assignWithProb(choice1, choice2, prob):
 
 
 def compute_Belief_porportion(model):
-    agent_Belief = [agent.Belief for agent in model.schedule.agents]
+    agent_Belief = [agent for agent in model.schedule.agents]
     B = sum(map(lambda x: x >= model.uncertaintyU, agent_Belief))
     return B / len(agent_Belief)
 
@@ -56,63 +56,44 @@ def majorityElement(A):
 class BIDAgent(Agent):
     """ An agent with fixed initial wealth."""
 
-    def __init__(self, unique_id, initBelief, initActive, payoff, initNeighborList, alpha, teta,
-                 uncertaintyL, uncertaintyU,
+    def __init__(self, unique_id, initBeliefList, initNeighborList, alpha, teta,
+                 uncertaintyList,
                  model):
         super().__init__(unique_id, model)
-        self.Belief = initBelief
+        self.BeliefList = initBeliefList
+        # example:[{'p':0, 'name':'content name','belief':1,'IsActive':2,'uncertainty':0.2}]
         self.Alpha = alpha
         self.Teta = teta
-        self.uncertaintyL = uncertaintyL
-        self.uncertaintyU = uncertaintyU
-        self.Active = initActive
         self.NeighborList = initNeighborList
-        self.Payoff = payoff
-        self.HistoryOfSteps = []
-    #new branch
+
+    # new branch
+
     def step(self):
-        self.Payoff = 0
-        if self.uncertaintyU > self.Belief > self.uncertaintyL:
-            for n in self.NeighborList:
-                neighborAgent = self.model.schedule.agents[n]
-                if neighborAgent.Belief >= 0 and self.Belief >= 0:
-                    self.Payoff += 1
-                elif neighborAgent.Belief < 0 and self.Belief < 0:
-                    self.Payoff += 1
-                elif self.Belief < 0:
-                    self.Payoff += 1 - self.Alpha
-                else:
-                    self.Payoff += self.Alpha - 1
-            if len(self.NeighborList) > 0:
-                self.Belief = (self.Belief + self.Payoff / len(self.NeighborList)) / 2
-            else:
-                self.Belief = self.Belief
-        else:
-            self.Belief = self.Belief
-        self.HistoryOfSteps.append(self.Belief)
+        for i, c in enumerate(self.BeliefList):
+            self.BeliefList[i]['P'] = c['uncertainty'] * self.Alpha + c['belief']
 
     def selectNextActive(self):
         neighborActive = 0
         neighborInActive = 0
+
+        # moshkele in code ine ke active neighbor be ezaye har content bayad bashe
+
         if len(self.NeighborList) == 0:
             self.Active = 0
         else:
-            for n in self.NeighborList:
-                neighborAgent = self.model.schedule.agents[n]
-                if neighborAgent.Active == 1:
-                    neighborActive += 1
+            for i, c in enumerate(self.BeliefList):
+                for n in self.NeighborList:
+                    neighborAgentBeliefList = self.model.schedule.agents[n].BeliefList
+                    for cn in neighborAgentBeliefList:
+                        if c['name'] == cn['name'] and cn['IsActive'] == 1:
+                            neighborActive += 1
+                    else:
+                        neighborInActive += 1
+                I = neighborActive / len(self.NeighborList)
+                if self.BeliefList[i]['P'] * I > self.Teta:
+                    self.BeliefList[i]['IsActive'] = 1
                 else:
-                    neighborInActive += 1
-
-            if self.Active == 0:  # if it has not activated yet
-                if self.Belief > self.uncertaintyU:  # if you belief something you dont care about your neighbors
-                    self.Active = 1
-                elif self.Belief < self.uncertaintyL:
-                    self.Active = 0
-                else:  # if you are not sure about sth you see your friends
-                    I = neighborActive / len(self.NeighborList)
-                    if I > self.Teta:
-                        self.Active = 1
+                    self.BeliefList[i]['IsActive'] = 0
 
 
 class BIDModel(Model):
@@ -129,16 +110,13 @@ class BIDModel(Model):
         activeInit = np.random.choice([0, 1], len(self.Graph.NodeList), p=[1 - self.Active, self.Active])
         # Create agents
         for i in self.Graph.NodeList:
-
-            if activeInit[i] == 1:
-                beliefInit = random.randint(0, 1)
-            else:
-                beliefInit = random.randint(-1, 0)
-
+            temp = {'p': 0, 'name': 'content name', 'belief': 1, 'IsActive': 2, 'uncertainty': 0.2}
+            agentContentList = []
             neighborListInit = self.Graph.neighbor(i)
-            a = BIDAgent(i, beliefInit, activeInit[i], 0, neighborListInit, self.Alpha,
-                         self.Teta, self.uncertaintyL, self.uncertaintyU,
-                         self)
+            for content in self.Graph.content(i):
+                agentContentList.append(content.Name)
+
+            a = BIDAgent(i, agentContentList, activeInit[i], 0, neighborListInit, self.Alpha, self.Teta)
             self.schedule.add(a)
 
         self.datacollector = DataCollector(
