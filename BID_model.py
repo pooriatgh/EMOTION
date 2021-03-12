@@ -56,9 +56,7 @@ def majorityElement(A):
 class BIDAgent(Agent):
     """ An agent with fixed initial wealth."""
 
-    def __init__(self, unique_id, initBeliefList, initNeighborList, alpha, teta,
-                 uncertaintyList,
-                 model):
+    def __init__(self, unique_id, initBeliefList, initNeighborList, alpha, teta, model):
         super().__init__(unique_id, model)
         self.BeliefList = initBeliefList
         # example:[{'p':0, 'name':'content name','belief':1,'IsActive':2,'uncertainty':0.2}]
@@ -99,24 +97,17 @@ class BIDAgent(Agent):
 class BIDModel(Model):
     """A model with some number of agents."""
 
-    def __init__(self, alpha, teta, uncertaintyL, uncertaintyU, graph, ActiveInit):
-        self.Graph = graph
+    def __init__(self, alpha, teta, diffusionLayer, beliefLayer):
+        self.DiffusionLayer = diffusionLayer
+        self.BeliefLayer = beliefLayer
         self.schedule = StagedActivation(self, ["step", "selectNextActive"])
         self.Alpha = alpha
         self.Teta = teta
-        self.uncertaintyL = uncertaintyL
-        self.uncertaintyU = uncertaintyU
-        self.Active = ActiveInit
-        activeInit = np.random.choice([0, 1], len(self.Graph.NodeList), p=[1 - self.Active, self.Active])
         # Create agents
-        for i in self.Graph.NodeList:
-            temp = {'p': 0, 'name': 'content name', 'belief': 1, 'IsActive': 2, 'uncertainty': 0.2}
-            agentContentList = []
-            neighborListInit = self.Graph.neighbor(i)
-            for content in self.Graph.content(i):
-                agentContentList.append(content.Name)
-
-            a = BIDAgent(i, agentContentList, activeInit[i], 0, neighborListInit, self.Alpha, self.Teta)
+        for i in self.DiffusionLayer.NodeList:
+            neighborListInit = self.DiffusionLayer.neighbor(i)
+            initBeliefList = self.BeliefLayer.content(i)
+            a = BIDAgent(i, initBeliefList, neighborListInit, self.Alpha, self.Teta)
             self.schedule.add(a)
 
         self.datacollector = DataCollector(

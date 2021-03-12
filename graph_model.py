@@ -43,3 +43,4 @@ class Graph:
 
     def neighbor(self, node):
         return list(nx.neighbors(self.G, node))
+
