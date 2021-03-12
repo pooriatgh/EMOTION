@@ -1,6 +1,6 @@
 from BID_model import BIDModel
 from graph_model import Graph
-from Content_model import Content
+from Content_model import ContentLayer
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,25 +9,25 @@ from tqdm import tqdm
 
 
 def Experiment1():
-    stepNumber = 20
-    agentNumber = 1000
+    stepNumber = 5
+    agentNumber = 50
     # generate network
-    G = Graph(agentNumber, "barabasi")
+    diffusionLayer = Graph(agentNumber, "barabasi")
+    contentList = ["covid1","covid2","covid3","covid4"]
+    beliefLayer = ContentLayer(agentList=diffusionLayer.NodeList, contentList=contentList, density=0.3)
 
     # generate contents
-    listContent = [Content(name="#covid")]
-    config1 = {"alpha": 1, "teta": 0.3, "uncertaintyL": -0.3, "uncertaintyU": .3, "graph": G, "ActiveInit": 0.3}
-    config2 = {"alpha": 1, "teta": 0.3, "uncertaintyL": -0.9, "uncertaintyU": .9, "graph": G, "ActiveInit": 0.3}
-    config3 = {"alpha": 0, "teta": 0.3, "uncertaintyL": -0.3, "uncertaintyU": .3, "graph": G, "ActiveInit": 0.3}
-    config4 = {"alpha": 0, "teta": 0.3, "uncertaintyL": -0.9, "uncertaintyU": .9, "graph": G, "ActiveInit": 0.3}
+    config1 = {"alpha": 0.25, "teta": 0.3, "beliefLayer": beliefLayer, "diffusionLayer": diffusionLayer}
+    config2 = {"alpha": 0.5, "teta": 0.3, "beliefLayer": beliefLayer, "diffusionLayer": diffusionLayer}
+    config3 = {"alpha": 0.75, "teta": 0.3, "beliefLayer": beliefLayer, "diffusionLayer": diffusionLayer}
+    config4 = {"alpha": 1, "teta": 0.3, "beliefLayer": beliefLayer, "diffusionLayer": diffusionLayer}
 
     confiList = [config1, config2, config3, config4]
+
     for j in range(len(confiList)):
         # Run the model
         model = BIDModel(alpha=confiList[j]["alpha"], teta=confiList[j]["teta"],
-                         uncertaintyL=confiList[j]["uncertaintyL"],
-                         uncertaintyU=confiList[j]["uncertaintyU"], graph=confiList[j]["graph"],
-                         ActiveInit=confiList[j]["ActiveInit"])
+                         diffusionLayer=confiList[j]["diffusionLayer"], beliefLayer=confiList[j]["beliefLayer"])
         for i in tqdm(range(stepNumber), desc="steps"):
             model.step()
 
@@ -35,20 +35,11 @@ def Experiment1():
         agentData = model.datacollector.get_agent_vars_dataframe()
 
         modelData.to_csv("Result\model_barabasi_" + str(stepNumber) + "_" + str(agentNumber) + "_"
-                         + str(confiList[j]["alpha"]) + "_" + str(confiList[j]["alpha"])
-                         + "_" + str(confiList[j]["teta"] * 10) + "_" +
-                         str(confiList[j]["uncertaintyL"] * 10) + "_" +
-                         str(confiList[j]["uncertaintyU"] * 10) + ".csv")
+                         + str(confiList[j]["alpha"]) + "_" + str(confiList[j]["teta"] * 10) + ".csv")
 
         agentData.to_csv("Result\\agent_barabasi_" + str(stepNumber) + "_" + str(agentNumber) + "_"
-                         + str(confiList[j]["alpha"]) + "_" + str(confiList[j]["alpha"])
-                         + "_" +
-                         str(confiList[j]["teta"] * 10) + "_" +
-                         str(confiList[j]["uncertaintyL"] * 10) + "_" +
-                         str(confiList[j]["uncertaintyU"] * 10) + ".csv")
+                         + str(confiList[j]["alpha"]) + "_" + str(confiList[j]["teta"] * 10) + ".csv")
 
-        # modelData['active'].plot()
-        # plt.show()
 
         myArray = np.zeros((agentNumber, stepNumber))
         for i in range(stepNumber):
@@ -57,14 +48,11 @@ def Experiment1():
             for k in range(agentNumber):
                 myArray[k][i] = stepBelief[k]
 
-        path = "Result\\fig_barabasi_" + str(stepNumber) + "_" + str(agentNumber) + "_" \
-               + str(confiList[j]["alpha"]) + "_" + str(confiList[j]["alpha"]) + "_" \
-               + str(int(confiList[j]["teta"] * 10)) + "_" + str(int(confiList[j]["uncertaintyL"] * 10)) +\
-               "_" + str(int(confiList[j]["uncertaintyU"] * 10))\
-               + ".jpg"
+        path = "Result\\fig" + str(stepNumber) + "_" + str(agentNumber) + "_" \
+               + str(confiList[j]["alpha"]) + "_" + str(int(confiList[j]["teta"] * 10)) +".jpg"
+
         a = sorted(myArray, key=lambda a_entry: a_entry[1])
         heatMap(a, path)
-
 
 
 if __name__ == '__main__':

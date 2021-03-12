@@ -9,48 +9,30 @@ def assignWithProb(choice1, choice2, prob):
     return choice1 if random.random() < prob else choice2
 
 
-def compute_Belief_porportion(model):
-    agent_Belief = [agent for agent in model.schedule.agents]
-    B = sum(map(lambda x: x >= model.uncertaintyU, agent_Belief))
-    return B / len(agent_Belief)
+def compute_total_Activation(model):
+    allAgents = [agent for agent in model.schedule.agents]
+    sumActive = 0
+    for agent in allAgents:
+        for belief in agent.BeliefList:
+            if belief['IsActive'] == 1:
+                sumActive += 1
+    return sumActive
 
 
-def compute_Uncertain_porportion(model):
-    agent_Belief = [agent.Belief for agent in model.schedule.agents]
-    B = sum(map(lambda x: model.uncertaintyU > x > -model.uncertaintyL, agent_Belief))
-    return B / len(agent_Belief)
+def compute_AVG_Activation(model):
+    allAgents = [agent for agent in model.schedule.agents]
+    sumActive = 0
+    count = 0
+    for agent in allAgents:
+        for belief in agent.BeliefList:
+            count += 1
+            if belief['IsActive'] == 1:
+                sumActive += 1
+    return sumActive/count
 
 
-def compute_Disbelief_porportion(model):
-    agent_Belief = [agent.Belief for agent in model.schedule.agents]
-    B = sum(map(lambda x: x <= model.uncertaintyL, agent_Belief))
-    return B / len(agent_Belief)
 
 
-def compute_Active_porportion(model):
-    agent_active = [agent.Active for agent in model.schedule.agents]
-    agent_active_count = agent_active.count(1)
-    agent_inactive_count = agent_active.count(0)
-    B = agent_active_count / (agent_active_count + agent_inactive_count)
-    return B
-
-
-# Function to return majority element present in given list
-def majorityElement(A):
-    # create an empty Hash Map
-    dict = {}
-
-    # store each element's frequency in a dict
-    for i in A:
-        dict[i] = dict.get(i, 0) + 1
-
-    # return the element if its count is more than n/2
-    for key, value in dict.items():
-        if value > len(A) / 2:
-            return key
-
-    # no majority element is present
-    return -1
 
 
 class BIDAgent(Agent):
@@ -68,12 +50,11 @@ class BIDAgent(Agent):
 
     def step(self):
         for i, c in enumerate(self.BeliefList):
-            self.BeliefList[i]['P'] = c['uncertainty'] * self.Alpha + c['belief']
+            self.BeliefList[i]['p'] = c['uncertainty'] * self.Alpha + c['belief']
 
     def selectNextActive(self):
         neighborActive = 0
         neighborInActive = 0
-
         # moshkele in code ine ke active neighbor be ezaye har content bayad bashe
 
         if len(self.NeighborList) == 0:
@@ -88,7 +69,8 @@ class BIDAgent(Agent):
                     else:
                         neighborInActive += 1
                 I = neighborActive / len(self.NeighborList)
-                if self.BeliefList[i]['P'] * I > self.Teta:
+                probActive = self.BeliefList[i]['p'] + I - (self.BeliefList[i]['p'] * I)
+                if probActive > self.Teta:
                     self.BeliefList[i]['IsActive'] = 1
                 else:
                     self.BeliefList[i]['IsActive'] = 0
@@ -106,16 +88,14 @@ class BIDModel(Model):
         # Create agents
         for i in self.DiffusionLayer.NodeList:
             neighborListInit = self.DiffusionLayer.neighbor(i)
-            initBeliefList = self.BeliefLayer.content(i)
-            a = BIDAgent(i, initBeliefList, neighborListInit, self.Alpha, self.Teta)
+            initBeliefList = self.BeliefLayer.contentFor(i)
+            a = BIDAgent(i, initBeliefList, neighborListInit, self.Alpha, self.Teta, self)
             self.schedule.add(a)
 
         self.datacollector = DataCollector(
-            model_reporters={"BeliefCount": compute_Belief_porportion,
-                             "DisbeliefCount": compute_Disbelief_porportion,
-                             "UncertainCount": compute_Uncertain_porportion,
-                             "active": compute_Active_porportion}
-            , agent_reporters={"Belief": "Belief"})
+            model_reporters={"TotalActivation": compute_total_Activation,
+                             "AverageActivation": compute_AVG_Activation}
+            , agent_reporters={"BeliefList": "BeliefList"})
 
     def step(self):
         self.datacollector.collect(self)
