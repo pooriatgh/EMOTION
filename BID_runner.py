@@ -1,10 +1,11 @@
 from BID_model import BIDModel
+from ResultExport import ExportToCSV
 from graph_model import Graph
 from Content_model import ContentLayer
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from Plotter import heatMap
+from Plotter import heatMap, heatMapForAverageP
 from tqdm import tqdm
 
 
@@ -13,7 +14,7 @@ def Experiment1():
     agentNumber = 50
     # generate network
     diffusionLayer = Graph(agentNumber, "barabasi")
-    contentList = ["covid1","covid2","covid3","covid4"]
+    contentList = ["covid1", "covid2", "covid3", "covid4"]
     beliefLayer = ContentLayer(agentList=diffusionLayer.NodeList, contentList=contentList, density=0.3)
 
     # generate contents
@@ -34,25 +35,8 @@ def Experiment1():
         modelData = model.datacollector.get_model_vars_dataframe()
         agentData = model.datacollector.get_agent_vars_dataframe()
 
-        modelData.to_csv("Result\model_barabasi_" + str(stepNumber) + "_" + str(agentNumber) + "_"
-                         + str(confiList[j]["alpha"]) + "_" + str(confiList[j]["teta"] * 10) + ".csv")
-
-        agentData.to_csv("Result\\agent_barabasi_" + str(stepNumber) + "_" + str(agentNumber) + "_"
-                         + str(confiList[j]["alpha"]) + "_" + str(confiList[j]["teta"] * 10) + ".csv")
-
-
-        myArray = np.zeros((agentNumber, stepNumber))
-        for i in range(stepNumber):
-            stepBelief = agentData.xs(i, level="Step")["Belief"]
-            # Store the results: https://mesa.readthedocs.io/en/stable/tutorials/intro_tutorial.html#collecting-data
-            for k in range(agentNumber):
-                myArray[k][i] = stepBelief[k]
-
-        path = "Result\\fig" + str(stepNumber) + "_" + str(agentNumber) + "_" \
-               + str(confiList[j]["alpha"]) + "_" + str(int(confiList[j]["teta"] * 10)) +".jpg"
-
-        a = sorted(myArray, key=lambda a_entry: a_entry[1])
-        heatMap(a, path)
+        ExportToCSV(agentNumber, stepNumber, modelData, agentData, confiList, j)
+        heatMapForAverageP(agentNumber, stepNumber, agentData, confiList, j)
 
 
 if __name__ == '__main__':
