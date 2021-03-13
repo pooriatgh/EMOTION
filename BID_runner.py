@@ -2,10 +2,7 @@ from BID_model import BIDModel
 from ResultExport import ExportToCSV
 from graph_model import Graph
 from Content_model import ContentLayer
-import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
-from Plotter import heatMap, heatMapForAverageP
+from Plotter import heatMapForAverageP, heatMapForDelta
 from tqdm import tqdm
 
 
@@ -37,7 +34,7 @@ def Experiment1():
 
         ExportToCSV(agentNumber, stepNumber, modelData, agentData, confiList, j)
         heatMapForAverageP(agentNumber, stepNumber, agentData, confiList, j)
-
+        heatMapForDelta(agentNumber, stepNumber, agentData, confiList, j)
 
 if __name__ == '__main__':
     Experiment1()

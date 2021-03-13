@@ -2,6 +2,8 @@ import random
 from mesa import Agent, Model
 from mesa.datacollection import DataCollector
 from mesa.time import StagedActivation
+from copy import deepcopy
+import statistics
 import numpy as np
 
 
@@ -20,19 +22,18 @@ def compute_total_Activation(model):
 
 
 def compute_AVG_Activation(model):
-    allAgents = [agent for agent in model.schedule.agents]
-    sumActive = 0
-    count = 0
-    for agent in allAgents:
-        for belief in agent.BeliefList:
-            count += 1
-            if belief['IsActive'] == 1:
-                sumActive += 1
-    return sumActive/count
-
-
-
-
+    # allAgents = [agent for agent in model.schedule.agents]
+    # for i,content in enumerate(model.BeliefLayer.allContents):
+    #     for agent in allAgents:
+    #         delta = 0
+    #         neighborsB = []
+    #         neighbors = agent.NeighborList
+    #         for n in neighbors:
+    #             for belief in n.BeliefList:
+    #                 if belief['name'] == content:
+    #                     neighborsB.append(belief['belief'])
+    #
+    return [1, 2, 3, 4, 5]  # sumActive/count
 
 
 class BIDAgent(Agent):
@@ -40,7 +41,7 @@ class BIDAgent(Agent):
 
     def __init__(self, unique_id, initBeliefList, initNeighborList, alpha, teta, model):
         super().__init__(unique_id, model)
-        self.BeliefList = initBeliefList
+        self.BeliefList = deepcopy(initBeliefList)
         # example:[{'p':0, 'name':'content name','belief':1,'IsActive':2,'uncertainty':0.2}]
         self.Alpha = alpha
         self.Teta = teta
@@ -48,19 +49,24 @@ class BIDAgent(Agent):
 
     # new branch
 
-    def step(self):
-        for i, c in enumerate(self.BeliefList):
-            self.BeliefList[i]['p'] = c['uncertainty'] * self.Alpha + c['belief']
+    def step1(self):
+        tempBeliefList = deepcopy(self.BeliefList)
+        for i, co in enumerate(tempBeliefList):
+            tempBeliefList[i]['p'] = co['uncertainty'] * self.Alpha + co['belief']
+            tempBeliefList[i]['delta'] = abs(tempBeliefList[i]['p'] - self.AVGneighborsBelief(co))
+        self.BeliefList = deepcopy(tempBeliefList)
 
-    def selectNextActive(self):
+
+    def step2(self):
         neighborActive = 0
         neighborInActive = 0
-        # moshkele in code ine ke active neighbor be ezaye har content bayad bashe
-
         if len(self.NeighborList) == 0:
             self.Active = 0
         else:
-            for i, c in enumerate(self.BeliefList):
+            # halat e koli dar in step bayad ye farayandi bashe ke meghdar p,b,u baraye karbar taghiir kone
+            #vagrna model sabet kar mikone va maghadir taghiir nemikonan
+            tempBeliefList = deepcopy(self.BeliefList)
+            for i, c in enumerate(tempBeliefList):
                 for n in self.NeighborList:
                     neighborAgentBeliefList = self.model.schedule.agents[n].BeliefList
                     for cn in neighborAgentBeliefList:
@@ -69,11 +75,21 @@ class BIDAgent(Agent):
                     else:
                         neighborInActive += 1
                 I = neighborActive / len(self.NeighborList)
-                probActive = self.BeliefList[i]['p'] + I - (self.BeliefList[i]['p'] * I)
+                probActive = tempBeliefList[i]['p'] + I - (tempBeliefList[i]['p'] * I)
                 if probActive > self.Teta:
-                    self.BeliefList[i]['IsActive'] = 1
+                    tempBeliefList[i]['IsActive'] = 1
                 else:
-                    self.BeliefList[i]['IsActive'] = 0
+                    tempBeliefList[i]['IsActive'] = 0
+            self.BeliefList = deepcopy(tempBeliefList)
+
+    def AVGneighborsBelief(self, c):
+        beliefList = [0]
+        for n in self.NeighborList:
+            agentN = self.model.schedule.agents[n]
+            for content in agentN.BeliefList:
+                if content['name'] == c['name']:
+                    beliefList.append(content['p'])
+        return statistics.mean(beliefList)
 
 
 class BIDModel(Model):
@@ -82,7 +98,7 @@ class BIDModel(Model):
     def __init__(self, alpha, teta, diffusionLayer, beliefLayer):
         self.DiffusionLayer = diffusionLayer
         self.BeliefLayer = beliefLayer
-        self.schedule = StagedActivation(self, ["step", "selectNextActive"])
+        self.schedule = StagedActivation(self, ["step1", "step2"])
         self.Alpha = alpha
         self.Teta = teta
         # Create agents

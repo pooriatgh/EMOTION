@@ -14,6 +14,9 @@ class ContentLayer:
     def graph(self):
         self.GraphBipartite = GraphBipartite(self.AgentList, self.ContentList, self.density)
 
+    def allContents(self):
+        return self.GraphBipartite.ContentList
+
     def contentFor(self, i):
         contentAgenti = self.GraphBipartite.following(i)
         contentBeliefList = []
@@ -21,8 +24,9 @@ class ContentLayer:
             p = 0  # this parameter is calculated during steps
             isActive = random.choice([0, 1])
             belief = random.uniform(0, 1)
-            uncertainty = random.uniform(0, 1-belief)
-            temp = {'p': 0, 'name': content, 'belief': belief, 'IsActive': isActive, 'uncertainty': uncertainty}
+            uncertainty = random.uniform(0, 1 - belief)
+            temp = {'p': 0, 'name': content, 'delta': 0, 'belief': belief, 'IsActive': isActive,
+                    'uncertainty': uncertainty}
             contentBeliefList.append(temp)
         return contentBeliefList
 
