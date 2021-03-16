@@ -4,11 +4,12 @@ import random
 
 
 class ContentLayer:
-    def __init__(self, agentList, contentList, density=0.3):
+    def __init__(self, agentList, contentList, activePercent, density=0.3):
         self.ContentList = contentList
         self.AgentList = agentList
         self.density = density
         self.GraphBipartite = None
+        self.ActivePercent = activePercent
         self.graph()
 
     def graph(self):
@@ -20,11 +21,19 @@ class ContentLayer:
     def contentFor(self, i):
         contentAgenti = self.GraphBipartite.following(i)
         contentBeliefList = []
-        for content in contentAgenti:
-            p = 0  # this parameter is calculated during steps
-            isActive = random.choice([0, 1])
-            belief = random.uniform(0, 1)
-            uncertainty = random.uniform(0, 1 - belief)
+        activeInit = np.random.choice([0, 1], len(contentAgenti), p=[1 - self.ActivePercent, self.ActivePercent])
+        uncertaintyInit = np.random.uniform(0.5, 1, len(contentAgenti))
+        for i, content in enumerate(contentAgenti):
+
+            isActive = 0
+            if activeInit[i] == 1:
+                isActive = 1
+                belief = random.uniform(0.8, 1)
+                uncertainty = random.uniform(0, 1 - belief)
+            else:
+                belief = random.uniform(0, 1 - uncertaintyInit[i])
+                uncertainty = uncertaintyInit[i]
+
             temp = {'p': 0, 'name': content, 'delta': 0, 'belief': belief, 'IsActive': isActive,
                     'uncertainty': uncertainty}
             contentBeliefList.append(temp)

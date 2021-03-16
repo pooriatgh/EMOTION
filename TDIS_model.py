@@ -15,11 +15,12 @@ def compute_trust_porportion(model):
     B = (agent_trusted_count) / (agent_untrusted_count + 1)
     return B
 
+
 def compute_Active_porportion(model):
     agent_active = [agent.Active for agent in model.schedule.agents]
     agent_active_count = agent_active.count(1)
     agent_inactive_count = agent_active.count(0)
-    B = (agent_active_count+1) / (agent_inactive_count + 1)
+    B = (agent_active_count + 1) / (agent_inactive_count + 1)
     return B
 
 
@@ -136,7 +137,7 @@ class TDISModel(Model):
             self.schedule.add(a)
 
         self.datacollector = DataCollector(
-            model_reporters={"trust": compute_trust_porportion,"active":compute_Active_porportion},
+            model_reporters={"trust": compute_trust_porportion, "active": compute_Active_porportion},
             agent_reporters={"Score": "Score"})
 
     def step(self):

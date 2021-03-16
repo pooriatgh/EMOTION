@@ -56,30 +56,34 @@ class BIDAgent(Agent):
             tempBeliefList[i]['delta'] = abs(tempBeliefList[i]['p'] - self.AVGneighborsBelief(co))
         self.BeliefList = deepcopy(tempBeliefList)
 
-
     def step2(self):
         neighborActive = 0
-        neighborInActive = 0
         if len(self.NeighborList) == 0:
             self.Active = 0
         else:
             # halat e koli dar in step bayad ye farayandi bashe ke meghdar p,b,u baraye karbar taghiir kone
-            #vagrna model sabet kar mikone va maghadir taghiir nemikonan
+            # vagrna model sabet kar mikone va maghadir taghiir nemikonan
             tempBeliefList = deepcopy(self.BeliefList)
             for i, c in enumerate(tempBeliefList):
+                neighborActive = 0
                 for n in self.NeighborList:
                     neighborAgentBeliefList = self.model.schedule.agents[n].BeliefList
                     for cn in neighborAgentBeliefList:
                         if c['name'] == cn['name'] and cn['IsActive'] == 1:
                             neighborActive += 1
-                    else:
-                        neighborInActive += 1
                 I = neighborActive / len(self.NeighborList)
-                probActive = tempBeliefList[i]['p'] + I - (tempBeliefList[i]['p'] * I)
-                if probActive > self.Teta:
-                    tempBeliefList[i]['IsActive'] = 1
+
+
+                if tempBeliefList[i]['uncertainty'] > 0.2 and I > self.Teta:
+                    if tempBeliefList[i]['IsActive'] == 0:
+                        changeValue = tempBeliefList[i]['uncertainty'] * 0.5
+                        tempBeliefList[i]['belief'] += changeValue
+                        tempBeliefList[i]['uncertainty'] -=changeValue
                 else:
-                    tempBeliefList[i]['IsActive'] = 0
+                    if tempBeliefList[i]['IsActive'] == 0:
+                        tempBeliefList[i]['IsActive'] = \
+                            np.random.choice([0, 1], p=[1 - tempBeliefList[i]['p'],tempBeliefList[i]['p']])
+
             self.BeliefList = deepcopy(tempBeliefList)
 
     def AVGneighborsBelief(self, c):

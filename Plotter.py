@@ -1,7 +1,9 @@
 import numpy as np
 import statistics
+
 np.random.seed(0)
 import seaborn as sns
+
 sns.set_theme()
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
@@ -15,6 +17,7 @@ def heatMap(twoDArray, path):
     ax.axes.get_yaxis().set_visible(False)
     plt.show()
     fig.savefig(path)
+
 
 def streamPlot():
     w = 2
@@ -33,6 +36,8 @@ def streamPlot():
     ax1.set_title('Varying Color')
     plt.tight_layout()
     plt.show()
+
+
 # drawing results
 # Store the results: https://mesa.readthedocs.io/en/stable/tutorials/intro_tutorial.html#collecting-data
 
@@ -41,12 +46,12 @@ def heatMapForAverageP(agentNumber, stepNumber, agentData, confiList, configInde
     for i in range(stepNumber):
         allAgentsBeliefList = agentData.xs(i, level="Step")["BeliefList"]
         for k in range(agentNumber):
-            pList= [0]
+            pList = [0]
             for content in allAgentsBeliefList[k]:
                 pList.append(content["p"])
             myArray[k][i] = statistics.mean(pList)
 
-    a = sorted(myArray[:,1:], key=lambda a_entry: a_entry[1])
+    a = sorted(myArray[:, 1:], key=lambda a_entry: a_entry[1])
     heatMap(a, "Result\\AverageForP_" + str(stepNumber) + "_" + str(agentNumber) + "_" +
             str(confiList[configIndex]["alpha"]) + "_" + str(
         int(confiList[configIndex]["teta"] * 10)) + ".jpg")
@@ -62,8 +67,24 @@ def heatMapForDelta(agentNumber, stepNumber, agentData, confiList, configIndex):
                 deltaList.append(content["delta"])
             myArray[k][i] = statistics.mean(deltaList)
 
-    a = sorted(myArray[:,1:], key=lambda a_entry: a_entry[1])
+    a = sorted(myArray[:, 1:], key=lambda a_entry: a_entry[1])
     heatMap(a, "Result\\AverageDelta_" + str(stepNumber) + "_" + str(agentNumber) + "_" +
+            str(confiList[configIndex]["alpha"]) + "_" + str(
+        int(confiList[configIndex]["teta"] * 10)) + ".jpg")
+
+
+def heatMapForUncertainty(agentNumber, stepNumber, agentData, confiList, configIndex):
+    myArray = np.zeros((agentNumber, stepNumber))
+    for i in range(stepNumber):
+        allAgentsBeliefList = agentData.xs(i, level="Step")["BeliefList"]
+        for k in range(agentNumber):
+            deltaList = [0]
+            for content in allAgentsBeliefList[k]:
+                deltaList.append(content["uncertainty"])
+            myArray[k][i] = statistics.mean(deltaList)
+
+    a = sorted(myArray[:, 1:], key=lambda a_entry: a_entry[1])
+    heatMap(a, "Result\\AverageU_" + str(stepNumber) + "_" + str(agentNumber) + "_" +
             str(confiList[configIndex]["alpha"]) + "_" + str(
         int(confiList[configIndex]["teta"] * 10)) + ".jpg")
 
@@ -86,4 +107,11 @@ def heatMapForAgentContent(agentNumber, stepNumber, contentNumber, agentData, co
         int(confiList[configIndex]["teta"] * 10)) + ".jpg")
 
 
-
+def lineForActiveNumber(agentNumber, stepNumber, modelData, confiList, configIndex):
+    fig = plt.figure()
+    plt.plot(range(len(modelData['TotalActivation'])), modelData['TotalActivation'])
+    plt.show()
+    path = "Result\\AverageForP_" + str(stepNumber) + "_" + str(agentNumber) + \
+           "_" + str(confiList[configIndex]["alpha"]) + "_" + \
+           str(int(confiList[configIndex]["teta"] * 10)) + ".jpg"
+    fig.savefig(path)
