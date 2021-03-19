@@ -22,19 +22,18 @@ class ContentLayer:
         contentAgenti = self.GraphBipartite.following(i)
         contentBeliefList = []
         activeInit = np.random.choice([0, 1], len(contentAgenti), p=[1 - self.ActivePercent, self.ActivePercent])
-        uncertaintyInit = np.random.uniform(0.5, 1, len(contentAgenti))
+        uncertaintyInit = np.random.uniform(0.7, 0.8, len(contentAgenti))
+        beliefInit = np.random.uniform(0, 0.1, len(contentAgenti))
+
         for i, content in enumerate(contentAgenti):
+            # if activeInit[i] == 1:
+            #     belief = random.uniform(0.8, 1)
+            #     uncertainty = random.uniform(0, 1 - belief)
+            # else:
+            belief = beliefInit[i]#random.uniform(0, 0.9 - uncertaintyInit[i])
+            uncertainty = uncertaintyInit[i]
 
-            isActive = 0
-            if activeInit[i] == 1:
-                isActive = 1
-                belief = random.uniform(0.8, 1)
-                uncertainty = random.uniform(0, 1 - belief)
-            else:
-                belief = random.uniform(0, 1 - uncertaintyInit[i])
-                uncertainty = uncertaintyInit[i]
-
-            temp = {'p': 0, 'name': content, 'delta': 0, 'belief': belief, 'IsActive': isActive,
+            temp = {'p': 0, 'name': content, 'delta': 0, 'belief': belief, 'IsActive': activeInit[i],
                     'uncertainty': uncertainty}
             contentBeliefList.append(temp)
         return contentBeliefList

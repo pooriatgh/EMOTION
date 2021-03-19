@@ -1,13 +1,12 @@
-import numpy as np
 import statistics
-
-np.random.seed(0)
 import seaborn as sns
-
-sns.set_theme()
+import pandas as pd
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import numpy as np
+
+data = sns.load_dataset('titanic')
+from pandas.plotting import parallel_coordinates
 
 
 # drawing functions
@@ -16,6 +15,28 @@ def heatMap(twoDArray, path):
     ax = sns.heatmap(twoDArray)
     ax.axes.get_yaxis().set_visible(False)
     plt.show()
+    fig.savefig(path)
+
+
+def parallelCoordinate(csvPath, destPath):
+    fig = plt.figure()
+    df = pd.read_csv(csvPath)
+    # df = df[(df['alpha'] == 0.9) | (df['alpha'] == 0.1)]
+    # selected_columns['is_alive'] = selected_columns['alive'] == 'yes'
+    # selected_columns = df.drop(columns='alive')
+    parallel_coordinates(df, 'alpha', colors=['red', 'yellow', 'green', 'blue'])
+    plt.xticks(rotation=90)
+    plt.show()
+    fig.savefig(destPath)
+
+
+def heatMap2D(listtwoDArray, path, cmaps):
+    fig, axn = plt.subplots(nrows=2, ncols=2, figsize=(10, 10))
+    for i, ax in enumerate(axn.flat):
+        pos = ax.imshow(listtwoDArray[i],
+                        interpolation='spline16', cmap=cmaps, aspect="auto")
+        fig.colorbar(pos, ax=ax)
+    plt.tight_layout()
     fig.savefig(path)
 
 
@@ -38,80 +59,80 @@ def streamPlot():
     plt.show()
 
 
+def linePlot():
+    x = [1, 2, 3, 4, 5, 6]
+    y = [1, 5, 3, 5, 7, 8]
+    y1 = [10, 50, 30, 50, 70, 8]
+    plt.plot(x, y, label="a")
+    plt.plot(x, y1, label="b")
+    plt.legend()
+    plt.show()
+
+
 # drawing results
 # Store the results: https://mesa.readthedocs.io/en/stable/tutorials/intro_tutorial.html#collecting-data
 
-def heatMapForAverageP(agentNumber, stepNumber, agentData, confiList, configIndex):
-    myArray = np.zeros((agentNumber, stepNumber))
-    for i in range(stepNumber):
-        allAgentsBeliefList = agentData.xs(i, level="Step")["BeliefList"]
-        for k in range(agentNumber):
-            pList = [0]
-            for content in allAgentsBeliefList[k]:
-                pList.append(content["p"])
-            myArray[k][i] = statistics.mean(pList)
+def heatMapForAverageP(agentNumber, stepNumber, agentDataList, confiList):
+    listA = []
+    for confIndex, agentData in enumerate(agentDataList):
+        myArray = np.zeros((agentNumber, stepNumber))
+        for i in range(stepNumber):
+            allAgentsBeliefList = agentData.xs(i, level="Step")["BeliefList"]
+            for k in range(agentNumber):
+                pList = [0]
+                for content in allAgentsBeliefList[k]:
+                    pList.append(content["p"])
+                myArray[k][i] = statistics.mean(pList)
 
-    a = sorted(myArray[:, 1:], key=lambda a_entry: a_entry[1])
-    heatMap(a, "Result\\AverageForP_" + str(stepNumber) + "_" + str(agentNumber) + "_" +
-            str(confiList[configIndex]["alpha"]) + "_" + str(
-        int(confiList[configIndex]["teta"] * 10)) + ".jpg")
-
-
-def heatMapForDelta(agentNumber, stepNumber, agentData, confiList, configIndex):
-    myArray = np.zeros((agentNumber, stepNumber))
-    for i in range(stepNumber):
-        allAgentsBeliefList = agentData.xs(i, level="Step")["BeliefList"]
-        for k in range(agentNumber):
-            deltaList = [0]
-            for content in allAgentsBeliefList[k]:
-                deltaList.append(content["delta"])
-            myArray[k][i] = statistics.mean(deltaList)
-
-    a = sorted(myArray[:, 1:], key=lambda a_entry: a_entry[1])
-    heatMap(a, "Result\\AverageDelta_" + str(stepNumber) + "_" + str(agentNumber) + "_" +
-            str(confiList[configIndex]["alpha"]) + "_" + str(
-        int(confiList[configIndex]["teta"] * 10)) + ".jpg")
+        a = sorted(myArray[:, 1:], key=lambda a_entry: a_entry[1])
+        listA.append(a)
+    heatMap2D(listA, "Result\\AveragePAll.jpg", 'viridis')
 
 
-def heatMapForUncertainty(agentNumber, stepNumber, agentData, confiList, configIndex):
-    myArray = np.zeros((agentNumber, stepNumber))
-    for i in range(stepNumber):
-        allAgentsBeliefList = agentData.xs(i, level="Step")["BeliefList"]
-        for k in range(agentNumber):
-            deltaList = [0]
-            for content in allAgentsBeliefList[k]:
-                deltaList.append(content["uncertainty"])
-            myArray[k][i] = statistics.mean(deltaList)
+def heatMapForDelta(agentNumber, stepNumber, agentDataList, confiList):
+    listA = []
+    for confIndex, agentData in enumerate(agentDataList):
+        myArray = np.zeros((agentNumber, stepNumber))
+        for i in range(stepNumber):
+            allAgentsBeliefList = agentData.xs(i, level="Step")["BeliefList"]
+            for k in range(agentNumber):
+                deltaList = [0]
+                for content in allAgentsBeliefList[k]:
+                    deltaList.append(content["delta"])
+                myArray[k][i] = statistics.mean(deltaList)
 
-    a = sorted(myArray[:, 1:], key=lambda a_entry: a_entry[1])
-    heatMap(a, "Result\\AverageU_" + str(stepNumber) + "_" + str(agentNumber) + "_" +
-            str(confiList[configIndex]["alpha"]) + "_" + str(
-        int(confiList[configIndex]["teta"] * 10)) + ".jpg")
+        a = sorted(myArray[:, 1:], key=lambda a_entry: a_entry[1])
+        listA.append(a)
 
-
-def heatMapForAgentContent(agentNumber, stepNumber, contentNumber, agentData, confiList, configIndex):
-    myArray = np.zeros((agentNumber, contentNumber))
-    allAgentsBeliefList = agentData.xs(stepNumber - 1, level="Step")["BeliefList"]
-    for k in range(agentNumber):
-        avg_belief = 0
-        for i, content in enumerate(allAgentsBeliefList[k]):
-            avg_belief += content["p"]
-            if len(allAgentsBeliefList[k]) != 0:
-                myArray[k][i] = avg_belief / len(allAgentsBeliefList[k])
-            else:
-                myArray[k][i] = 0
-
-    a = sorted(myArray, key=lambda a_entry: a_entry[1])
-    heatMap(a, "Result\\AgentContent_" + str(stepNumber) + "_" + str(agentNumber) + "_" +
-            str(confiList[configIndex]["alpha"]) + "_" + str(
-        int(confiList[configIndex]["teta"] * 10)) + ".jpg")
+    heatMap2D(listA, "Result\\AverageDeltaAll.jpg", 'plasma')
 
 
-def lineForActiveNumber(agentNumber, stepNumber, modelData, confiList, configIndex):
+def heatMapForUncertainty(agentNumber, stepNumber, agentDataList, confiList):
+    listA = []
+    for confIndex, agentData in enumerate(agentDataList):
+        myArray = np.zeros((agentNumber, stepNumber))
+        for i in range(stepNumber):
+            allAgentsBeliefList = agentData.xs(i, level="Step")["BeliefList"]
+            for k in range(agentNumber):
+                deltaList = [0]
+                for content in allAgentsBeliefList[k]:
+                    deltaList.append(content["uncertainty"])
+                myArray[k][i] = statistics.mean(deltaList)
+
+        a = sorted(myArray[:, 1:], key=lambda a_entry: a_entry[1])
+        listA.append(a)
+    heatMap2D(listA, "Result\\AverageUAll.jpg", 'magma')
+
+
+def lineForActiveNumber(agentNumber, stepNumber, modelDataList, confiList):
     fig = plt.figure()
-    plt.plot(range(len(modelData['TotalActivation'])), modelData['TotalActivation'])
+    colors = ['red', 'yellow', 'green', 'blue']
+    for index, modelData in enumerate(modelDataList):
+        plt.plot(range(len(modelData['TotalActivation'])), modelData['TotalActivation']
+                 , label="alpha=" + str(confiList[index]["alpha"]),color=colors[index])
+
+    plt.legend()
     plt.show()
-    path = "Result\\AverageForP_" + str(stepNumber) + "_" + str(agentNumber) + \
-           "_" + str(confiList[configIndex]["alpha"]) + "_" + \
-           str(int(confiList[configIndex]["teta"] * 10)) + ".jpg"
+    plt.xticks(rotation=90)
+    path = "Result\\ActiveNumber" + ".jpg"
     fig.savefig(path)

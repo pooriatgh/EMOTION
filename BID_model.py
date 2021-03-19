@@ -53,7 +53,7 @@ class BIDAgent(Agent):
         tempBeliefList = deepcopy(self.BeliefList)
         for i, co in enumerate(tempBeliefList):
             tempBeliefList[i]['p'] = co['uncertainty'] * self.Alpha + co['belief']
-            tempBeliefList[i]['delta'] = abs(tempBeliefList[i]['p'] - self.AVGneighborsBelief(co))
+            # tempBeliefList[i]['delta'] = abs(tempBeliefList[i]['belief'] - self.AVGneighborsBelief(co))
         self.BeliefList = deepcopy(tempBeliefList)
 
     def step2(self):
@@ -61,28 +61,29 @@ class BIDAgent(Agent):
         if len(self.NeighborList) == 0:
             self.Active = 0
         else:
-            # halat e koli dar in step bayad ye farayandi bashe ke meghdar p,b,u baraye karbar taghiir kone
-            # vagrna model sabet kar mikone va maghadir taghiir nemikonan
+
             tempBeliefList = deepcopy(self.BeliefList)
             for i, c in enumerate(tempBeliefList):
-                neighborActive = 0
-                for n in self.NeighborList:
-                    neighborAgentBeliefList = self.model.schedule.agents[n].BeliefList
-                    for cn in neighborAgentBeliefList:
-                        if c['name'] == cn['name'] and cn['IsActive'] == 1:
-                            neighborActive += 1
-                I = neighborActive / len(self.NeighborList)
-
-
-                if tempBeliefList[i]['uncertainty'] > 0.2 and I > self.Teta:
-                    if tempBeliefList[i]['IsActive'] == 0:
-                        changeValue = tempBeliefList[i]['uncertainty'] * 0.5
+                I = self.calculateTID(c['name'])
+                if tempBeliefList[i]['uncertainty'] > 0.25:
+                    if I > self.Teta:
+                        changeValue = tempBeliefList[i]['uncertainty'] * 0.25
                         tempBeliefList[i]['belief'] += changeValue
-                        tempBeliefList[i]['uncertainty'] -=changeValue
-                else:
-                    if tempBeliefList[i]['IsActive'] == 0:
-                        tempBeliefList[i]['IsActive'] = \
-                            np.random.choice([0, 1], p=[1 - tempBeliefList[i]['p'],tempBeliefList[i]['p']])
+                        tempBeliefList[i]['uncertainty'] -= changeValue
+                    else:
+                        changeValue = tempBeliefList[i]['belief'] * 0.25
+                        tempBeliefList[i]['belief'] -= changeValue
+                        tempBeliefList[i]['uncertainty'] += changeValue
+
+                #else:
+                if tempBeliefList[i]['IsActive'] == 0:
+                    try:
+                        tempBeliefList[i]['IsActive'] = np.random.choice([0, 1], p=[1 - tempBeliefList[i]['p'],
+                                                                                tempBeliefList[i]['p']])
+                    except:
+                        x = 2
+                    if tempBeliefList[i]['IsActive'] == 1:
+                        tempBeliefList[i]['delta'] = abs(I - tempBeliefList[i]['p'])
 
             self.BeliefList = deepcopy(tempBeliefList)
 
@@ -92,8 +93,18 @@ class BIDAgent(Agent):
             agentN = self.model.schedule.agents[n]
             for content in agentN.BeliefList:
                 if content['name'] == c['name']:
-                    beliefList.append(content['p'])
+                    beliefList.append(content['belief'])
         return statistics.mean(beliefList)
+
+    def calculateTID(self, contentName):
+        neighborActive = 0
+        for n in self.NeighborList:
+            neighborAgentBeliefList = self.model.schedule.agents[n].BeliefList
+            for cn in neighborAgentBeliefList:
+                if contentName == cn['name'] and cn['IsActive'] == 1:
+                    neighborActive += 1
+        I = neighborActive / len(self.NeighborList)
+        return I
 
 
 class BIDModel(Model):
@@ -115,7 +126,7 @@ class BIDModel(Model):
         self.datacollector = DataCollector(
             model_reporters={"TotalActivation": compute_total_Activation,
                              "AverageActivation": compute_AVG_Activation}
-            , agent_reporters={"BeliefList": "BeliefList"})
+            , agent_reporters={"BeliefList": "BeliefList", "alpha": "Alpha"})
 
     def step(self):
         self.datacollector.collect(self)
